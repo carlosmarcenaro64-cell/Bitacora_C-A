@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bitácora de C/A | Carlos Manuel Panameño Marcenaro</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header>
+    <div class="logo-container">
+        <h1 class="ca-title">Bitácora de C/A</h1>
+        <div class="glow-effect"></div>
+    </div>
+    <p class="subtitle">Carlos & Alexandra: Archivo de Aventuras</p>
+</header>
+
+<main class="container">
+    <section class="control-panel fade-in">
+        <div class="filter-header">
+            <h3>🔍 Filtrar Recuerdos</h3>
+        </div>
+        <div class="filter-controls">
+            <div class="filter-group">
+                <label>Por Fecha</label>
+                <input type="date" id="filtroFecha" onchange="mostrarEntradas()">
+            </div>
+            <div class="filter-group">
+                <label>Por Estrellas</label>
+                <select id="filtroEstrellas" onchange="mostrarEntradas()">
+                    <option value="todos">Todos</option>
+                    <option value="10">⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐ (10)</option>
+                    <option value="9">⭐⭐⭐⭐⭐⭐⭐⭐⭐ (9)</option>
+                    <option value="8">⭐⭐⭐⭐⭐⭐⭐⭐ (8)</option>
+                    <option value="7">7 o menos</option>
+                </select>
+            </div>
+            <button class="btn-reset" onclick="limpiarFiltros()">Restablecer</button>
+        </div>
+    </section>
+
+    <section class="form-container fade-in">
+        <h3>📝 Nuevo Registro</h3>
+        <select id="tipoEntrada" onchange="alternarCampos()">
+            <option value="lugar">📍 Salida / Lugar</option>
+            <option value="cine">🎬 Película / Cine</option>
+        </select>
+
+        <div class="form-grid">
+            <input type="text" id="nombre" placeholder="Nombre del lugar o película">
+            <input type="text" id="foto" placeholder="URL de la imagen">
+            <input type="date" id="fecha">
+        </div>
+
+        <div id="camposLugar">
+            <input type="number" id="califLugar" placeholder="Puntuación (1-10)" min="1" max="10">
+            <textarea id="divertido" placeholder="Lo más divertido..."></textarea>
+            <textarea id="aburrido" placeholder="Lo más aburrido..."></textarea>
+            <input type="text" id="datoLugar" placeholder="Dato importante">
+        </div>
+
+        <div id="camposCine" style="display:none;">
+            <input type="text" id="sensaciones" placeholder="Sensaciones">
+            <input type="number" id="estrellas" placeholder="Estrellas (1-10)" min="1" max="10">
+            <textarea id="gustoCine" placeholder="Lo que más nos gustó..."></textarea>
+            <textarea id="noGustoCine" placeholder="Lo que no nos gustó..."></textarea>
+            <input type="text" id="datoCine" placeholder="Dato adicional">
+        </div>
+
+        <button class="btn-save" onclick="guardarEntrada()">Guardar en Bitácora</button>
+    </section>
+
+    <div class="grid" id="contenedorPrincipal"></div>
+</main>
+
+<script>
+    document.addEventListener('DOMContentLoaded', mostrarEntradas);
+
+    function alternarCampos() {
+        const tipo = document.getElementById('tipoEntrada').value;
+        document.getElementById('camposLugar').style.display = tipo === 'lugar' ? 'block' : 'none';
+        document.getElementById('camposCine').style.display = tipo === 'cine' ? 'block' : 'none';
+    }
+
+    function guardarEntrada() {
+        const tipo = document.getElementById('tipoEntrada').value;
+        const nombre = document.getElementById('nombre').value;
+        if(!nombre) { alert("Señor, el nombre es vital."); return; }
+
+        let entradas = JSON.parse(localStorage.getItem('bitacora_ca')) || [];
+
+        const nuevaEntrada = {
+            id: Date.now(),
+            tipo: tipo,
+            nombre: nombre,
+            foto: document.getElementById('foto').value || 'https://images.unsplash.com/photo-1536440136628-849c177e76a1?q=80&w=400',
+            fecha: document.getElementById('fecha').value || new Date().toISOString().split('T')[0],
+            rating: tipo === 'lugar' ? document.getElementById('califLugar').value : document.getElementById('estrellas').value
+        };
+
+        if (tipo === 'lugar') {
+            nuevaEntrada.divertido = document.getElementById('divertido').value;
+            nuevaEntrada.aburrido = document.getElementById('aburrido').value;
+            nuevaEntrada.dato = document.getElementById('datoLugar').value;
+        } else {
+            nuevaEntrada.sensaciones = document.getElementById('sensaciones').value;
+            nuevaEntrada.gusto = document.getElementById('gustoCine').value;
+            nuevaEntrada.noGusto = document.getElementById('noGustoCine').value;
+            nuevaEntrada.dato = document.getElementById('datoCine').value;
+        }
+
+        entradas.push(nuevaEntrada);
+        localStorage.setItem('bitacora_ca', JSON.stringify(entradas));
+        location.reload();
+    }
+
+    function mostrarEntradas() {
+        const contenedor = document.getElementById('contenedorPrincipal');
+        const fFecha = document.getElementById('filtroFecha').value;
+        const fEstrellas = document.getElementById('filtroEstrellas').value;
+        
+        let entradas = JSON.parse(localStorage.getItem('bitacora_ca')) || [];
+
+        if(fFecha) entradas = entradas.filter(e => e.fecha === fFecha);
+        if(fEstrellas !== "todos") {
+            if(fEstrellas === "7") entradas = entradas.filter(e => parseInt(e.rating) <= 7);
+            else entradas = entradas.filter(e => e.rating === fEstrellas);
+        }
+
+        contenedor.innerHTML = entradas.reverse().map(e => `
+            <article class="card">
+                <div class="card-img-container">
+                    <img src="${e.foto}" alt="${e.nombre}">
+                    <span class="badge ${e.tipo}">${e.tipo}</span>
+                </div>
+                <div class="card-content">
+                    <p class="card-date">${e.fecha}</p>
+                    <h3>${e.nombre}</h3>
+                    <div class="card-rating">⭐ ${e.rating}/10</div>
+                    <div class="card-details">
+                        ${e.tipo === 'lugar' ? 
+                            `<p><strong>Divertido:</strong> ${e.divertido}</p>
+                             <p><strong>Info:</strong> ${e.dato}</p>` : 
+                            `<p><strong>Feel:</strong> ${e.sensaciones}</p>
+                             <p><strong>Gusto:</strong> ${e.gusto}</p>`}
+                    </div>
+                    <button class="btn-delete" onclick="eliminarEntrada(${e.id})">Eliminar</button>
+                </div>
+            </article>
+        `).join('');
+    }
+
+    function limpiarFiltros() {
+        document.getElementById('filtroFecha').value = "";
+        document.getElementById('filtroEstrellas').value = "todos";
+        mostrarEntradas();
+    }
+
+    function eliminarEntrada(id) {
+        if(confirm("¿Seguro que desea borrar este recuerdo, Señor?")) {
+            let entradas = JSON.parse(localStorage.getItem('bitacora_ca'));
+            entradas = entradas.filter(e => e.id !== id);
+            localStorage.setItem('bitacora_ca', JSON.stringify(entradas));
+            mostrarEntradas();
+        }
+    }
+</script>
+</body>
+</html>
