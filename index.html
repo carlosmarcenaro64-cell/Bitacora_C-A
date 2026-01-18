@@ -3,29 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bitácora de C/A | Carlos Manuel Panameño Marcenaro</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700;900&display=swap" rel="stylesheet">
+    <title>Bitácora de C/A | Archivo de Aventuras</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-<header>
-    <div class="logo-container">
-        <h1 class="ca-title">Bitácora de C/A</h1>
-        <div class="glow-effect"></div>
-    </div>
+<header class="main-header fade-in">
+    <h1 class="glow-title">BITÁCORA DE C/A</h1>
     <p class="subtitle">Archivo de Aventuras Eternas</p>
 </header>
 
 <main class="container">
-    <section class="control-panel fade-in">
-        <div class="filter-controls">
-            <div class="filter-group">
+    <section class="glass-panel filters fade-in-up">
+        <div class="filter-row">
+            <div class="filter-item">
                 <label>📅 Por Fecha</label>
                 <input type="date" id="filtroFecha" onchange="window.filtrar()">
             </div>
-            <div class="filter-group">
+            <div class="filter-item">
                 <label>⭐ Por Estrellas</label>
                 <select id="filtroEstrellas" onchange="window.filtrar()">
                     <option value="todos">Todos</option>
@@ -35,151 +31,189 @@
                     <option value="7">7 o menos</option>
                 </select>
             </div>
-            <button class="btn-reset" onclick="location.reload()">Limpiar Filtros</button>
+            <button class="btn-clean" onclick="location.reload()">Limpiar Filtros</button>
         </div>
     </section>
 
-    <section class="form-container fade-in">
-        <h3>📝 Registrar Nueva Experiencia</h3>
-        <select id="tipoEntrada" onchange="window.alternarCampos()">
-            <option value="lugar">📍 Salida / Lugar</option>
-            <option value="cine">🎬 Película / Cine</option>
-        </select>
-
-        <div class="form-grid">
-            <input type="text" id="nombre" placeholder="Nombre del lugar o película">
-            <input type="text" id="foto" placeholder="URL de la imagen">
-            <input type="date" id="fecha">
+    <section class="glass-panel form-card fade-in-up">
+        <div class="form-header">
+            <h3>📝 Registrar Nueva Experiencia</h3>
+            <span id="editBadge" class="badge-edit hidden">MODO EDICIÓN</span>
         </div>
+        
+        <input type="hidden" id="editKey">
+        
+        <div class="form-body">
+            <div class="input-row main-select">
+                <select id="tipoEntrada" onchange="window.alternarCampos()">
+                    <option value="lugar">📍 Salida / Lugar</option>
+                    <option value="cine">🎬 Película / Cine</option>
+                </select>
+            </div>
 
-        <div id="camposLugar">
-            <input type="number" id="califLugar" placeholder="Puntuación (1-10)" min="1" max="10">
-            <textarea id="divertido" placeholder="Lo más divertido..."></textarea>
-            <textarea id="aburrido" placeholder="Lo más aburrido..."></textarea>
-            <input type="text" id="datoLugar" placeholder="Dato importante">
+            <div class="input-grid">
+                <div class="input-group">
+                    <input type="text" id="nombre" placeholder=" " required>
+                    <label>Nombre del lugar o película</label>
+                </div>
+                <div class="input-group">
+                    <input type="text" id="foto" placeholder=" " required>
+                    <label>URL de la imagen</label>
+                </div>
+                <div class="input-group">
+                    <input type="date" id="fecha" required>
+                    <label class="static-label">Fecha</label>
+                </div>
+            </div>
+
+            <div id="camposLugar" class="dynamic-section">
+                <div class="input-grid-2">
+                    <div class="input-group">
+                        <input type="number" id="califLugar" min="1" max="10" placeholder=" ">
+                        <label>Puntuación (1-10)</label>
+                    </div>
+                    <div class="input-group">
+                        <input type="text" id="datoLugar" placeholder=" ">
+                        <label>Dato importante</label>
+                    </div>
+                </div>
+                <div class="textarea-grid">
+                    <textarea id="divertido" placeholder="Lo más divertido..."></textarea>
+                    <textarea id="aburrido" placeholder="Lo más aburrido..."></textarea>
+                </div>
+            </div>
+
+            <div id="camposCine" class="dynamic-section hidden">
+                <div class="input-grid-2">
+                    <div class="input-group">
+                        <input type="number" id="estrellas" min="1" max="10" placeholder=" ">
+                        <label>Estrellas (1-10)</label>
+                    </div>
+                    <div class="input-group">
+                        <input type="text" id="sensaciones" placeholder=" ">
+                        <label>Sensaciones</label>
+                    </div>
+                </div>
+                <div class="textarea-grid">
+                    <textarea id="gustoCine" placeholder="Lo que más nos gustó..."></textarea>
+                    <textarea id="noGustoCine" placeholder="Lo que no nos gustó..."></textarea>
+                </div>
+            </div>
+
+            <div class="form-footer">
+                <button class="btn-save" id="btnGuardar">Guardar en la Nube</button>
+                <button class="btn-cancel hidden" id="btnCancelar" onclick="window.cancelarEdicion()">Cancelar</button>
+            </div>
         </div>
-
-        <div id="camposCine" style="display:none;">
-            <input type="text" id="sensaciones" placeholder="Sensaciones">
-            <input type="number" id="estrellas" placeholder="Estrellas (1-10)" min="1" max="10">
-            <textarea id="gustoCine" placeholder="Lo que más nos gustó..."></textarea>
-            <textarea id="noGustoCine" placeholder="Lo que no nos gustó..."></textarea>
-            <input type="text" id="datoCine" placeholder="Dato adicional">
-        </div>
-
-        <button class="btn-save" id="btnGuardar">Guardar en la Nube</button>
     </section>
 
-    <div class="grid" id="contenedorPrincipal"></div>
+    <div class="grid-display" id="contenedorPrincipal"></div>
 </main>
 
 <script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-  import { getDatabase, ref, push, onValue, remove } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getDatabase, ref, push, onValue, remove, update } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
-  // Configuración extraída de sus capturas de pantalla
-  const firebaseConfig = {
-    apiKey: "AIzaSyDgc_fOFDZZTcBe2mtD0uGpgcFl4f34oPI",
-    authDomain: "bitacora-ca.firebaseapp.com",
-    projectId: "bitacora-ca",
-    storageBucket: "bitacora-ca.firebasestorage.app",
-    messagingSenderId: "707668977849",
-    appId: "1:707668977849:web:5e72c6eb55fcdfb4dad368",
-    measurementId: "G-BFZZW0151K",
-    databaseURL: "https://bitacora-ca-default-rtdb.firebaseio.com/"
-  };
-
-  const app = initializeApp(firebaseConfig);
-  const db = getDatabase(app);
-  const aventurasRef = ref(db, 'aventuras');
-
-  window.alternarCampos = function() {
-    const tipo = document.getElementById('tipoEntrada').value;
-    document.getElementById('camposLugar').style.display = tipo === 'lugar' ? 'block' : 'none';
-    document.getElementById('camposCine').style.display = tipo === 'cine' ? 'block' : 'none';
-  };
-
-  document.getElementById('btnGuardar').onclick = function() {
-    const tipo = document.getElementById('tipoEntrada').value;
-    const nombre = document.getElementById('nombre').value;
-    if(!nombre) return alert("Por favor, ingrese un nombre.");
-
-    const nuevaEntrada = {
-        tipo: tipo,
-        nombre: nombre,
-        foto: document.getElementById('foto').value || 'https://via.placeholder.com/400x225/16161a/e0e0e0?text=Recuerdo+C/A',
-        fecha: document.getElementById('fecha').value || new Date().toISOString().split('T')[0],
-        rating: tipo === 'lugar' ? document.getElementById('califLugar').value : document.getElementById('estrellas').value
+    const firebaseConfig = {
+        apiKey: "AIzaSyDgc_fOFDZZTcBe2mtD0uGpgcFl4f34oPI",
+        authDomain: "bitacora-ca.firebaseapp.com",
+        projectId: "bitacora-ca",
+        storageBucket: "bitacora-ca.firebasestorage.app",
+        messagingSenderId: "707668977849",
+        appId: "1:707668977849:web:5e72c6eb55fcdfb4dad368",
+        databaseURL: "https://bitacora-ca-default-rtdb.firebaseio.com/"
     };
 
-    if (tipo === 'lugar') {
-        nuevaEntrada.divertido = document.getElementById('divertido').value;
-        nuevaEntrada.aburrido = document.getElementById('aburrido').value;
-        nuevaEntrada.dato = document.getElementById('datoLugar').value;
-    } else {
-        nuevaEntrada.sensaciones = document.getElementById('sensaciones').value;
-        nuevaEntrada.gusto = document.getElementById('gustoCine').value;
-        nuevaEntrada.noGusto = document.getElementById('noGustoCine').value;
-        nuevaEntrada.dato = document.getElementById('datoCine').value;
-    }
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+    const aventurasRef = ref(db, 'aventuras');
 
-    push(aventurasRef, nuevaEntrada).then(() => {
-        alert("¡Recuerdo sincronizado en la nube!");
-        location.reload();
+    window.alternarCampos = () => {
+        const t = document.getElementById('tipoEntrada').value;
+        document.getElementById('camposLugar').classList.toggle('hidden', t !== 'lugar');
+        document.getElementById('camposCine').classList.toggle('hidden', t !== 'cine');
+    };
+
+    document.getElementById('btnGuardar').onclick = () => {
+        const key = document.getElementById('editKey').value;
+        const tipo = document.getElementById('tipoEntrada').value;
+        const entry = {
+            tipo,
+            nombre: document.getElementById('nombre').value,
+            foto: document.getElementById('foto').value,
+            fecha: document.getElementById('fecha').value,
+            rating: tipo === 'lugar' ? document.getElementById('califLugar').value : document.getElementById('estrellas').value,
+            divertido: document.getElementById('divertido').value || "",
+            aburrido: document.getElementById('aburrido').value || "",
+            sensaciones: document.getElementById('sensaciones').value || "",
+            gusto: document.getElementById('gustoCine').value || "",
+            noGusto: document.getElementById('noGustoCine').value || "",
+            dato: document.getElementById('datoLugar').value || ""
+        };
+
+        if(key) {
+            update(ref(db, `aventuras/${key}`), entry).then(() => location.reload());
+        } else {
+            push(aventurasRef, entry).then(() => location.reload());
+        }
+    };
+
+    onValue(aventurasRef, (snap) => {
+        window.raw = snap.val();
+        window.render(window.raw);
     });
-  };
 
-  onValue(aventurasRef, (snapshot) => {
-    const data = snapshot.val();
-    window.datosRaw = data;
-    window.renderizar(data);
-  });
-
-  window.renderizar = function(data) {
-    const contenedor = document.getElementById('contenedorPrincipal');
-    contenedor.innerHTML = '';
-    if (data) {
-        Object.keys(data).reverse().forEach(key => {
-            const e = data[key];
-            contenedor.innerHTML += `
-                <article class="card fade-in">
-                    <img src="${e.foto}" onerror="this.src='https://via.placeholder.com/400x225/16161a/e0e0e0?text=Imagen+no+disponible'">
-                    <div class="card-content">
-                        <span class="badge ${e.tipo}">${e.tipo}</span>
+    window.render = (data) => {
+        const cont = document.getElementById('contenedorPrincipal');
+        cont.innerHTML = '';
+        if(!data) return;
+        Object.keys(data).reverse().forEach(id => {
+            const e = data[id];
+            cont.innerHTML += `
+                <div class="card fade-in">
+                    <img src="${e.foto}" class="card-img">
+                    <div class="card-info">
+                        <span class="tag ${e.tipo}">${e.tipo}</span>
                         <h3>${e.nombre}</h3>
                         <p class="card-date">📅 ${e.fecha}</p>
                         <p class="card-rating">⭐ ${e.rating}/10</p>
-                        <div class="card-details">
-                            ${e.tipo === 'lugar' ? `<p>✅ ${e.divertido}</p>` : `<p>🎬 ${e.sensaciones}</p>`}
+                        <div class="card-actions">
+                            <button class="edit-btn" onclick="prepararEdicion('${id}')">Editar</button>
+                            <button class="del-btn" onclick="borrar('${id}')">Borrar</button>
                         </div>
-                        <button class="btn-delete" onclick="borrar('${key}')">Eliminar</button>
                     </div>
-                </article>`;
+                </div>`;
         });
-    }
-  };
+    };
 
-  window.filtrar = function() {
-      const fFecha = document.getElementById('filtroFecha').value;
-      const fEstrellas = document.getElementById('filtroEstrellas').value;
-      let filtrados = {};
-      
-      if(!window.datosRaw) return;
+    window.prepararEdicion = (id) => {
+        const e = window.raw[id];
+        document.getElementById('editKey').value = id;
+        document.getElementById('tipoEntrada').value = e.tipo;
+        document.getElementById('nombre').value = e.nombre;
+        document.getElementById('foto').value = e.foto;
+        document.getElementById('fecha').value = e.fecha;
+        if(e.tipo === 'lugar') {
+            document.getElementById('califLugar').value = e.rating;
+            document.getElementById('divertido').value = e.divertido;
+            document.getElementById('aburrido').value = e.aburrido;
+            document.getElementById('datoLugar').value = e.dato;
+        } else {
+            document.getElementById('estrellas').value = e.rating;
+            document.getElementById('sensaciones').value = e.sensaciones;
+            document.getElementById('gustoCine').value = e.gusto;
+            document.getElementById('noGustoCine').value = e.noGusto;
+        }
+        window.alternarCampos();
+        document.getElementById('formTitle').innerText = "✏️ Editando Aventura";
+        document.getElementById('btnGuardar').innerText = "Actualizar Registro";
+        document.getElementById('btnCancelar').classList.remove('hidden');
+        document.getElementById('editBadge').classList.remove('hidden');
+        window.scrollTo({top: 0, behavior: 'smooth'});
+    };
 
-      Object.keys(window.datosRaw).forEach(key => {
-          const e = window.datosRaw[key];
-          let cumpleFecha = fFecha ? e.fecha === fFecha : true;
-          let cumpleEstrellas = fEstrellas === "todos" ? true : (fEstrellas === "7" ? e.rating <= 7 : e.rating == fEstrellas);
-          if(cumpleFecha && cumpleEstrellas) filtrados[key] = e;
-      });
-      window.renderizar(filtrados);
-  };
-
-  window.borrar = function(id) {
-    if(confirm("¿Desea borrar este recuerdo permanentemente?")) {
-        remove(ref(db, `aventuras/${id}`));
-    }
-  };
+    window.borrar = (id) => confirm("¿Desea borrar este recuerdo?") && remove(ref(db, `aventuras/${id}`));
+    window.cancelarEdicion = () => location.reload();
 </script>
 </body>
 </html>
