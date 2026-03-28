@@ -3,54 +3,62 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bitácora de C/A | Carlos & Alexandra</title>
+    <title>Bitácora de C/A | Archivo Eterno</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;800&display=swap" rel="stylesheet">
-    <style>
-        /* Estilos base para asegurar visibilidad */
-        :root { --accent: #00ffaa; --bg: #0a0a0a; --glass: rgba(255,255,255,0.05); }
-        body { font-family: 'Poppins', sans-serif; background: var(--bg); color: white; margin: 0; padding: 20px; }
-        .glass-panel { background: var(--glass); backdrop-filter: blur(10px); border-radius: 15px; padding: 20px; margin-bottom: 20px; border: 1px solid rgba(255,255,255,0.1); }
-        .grid-display { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; }
-        .card { background: var(--glass); border-radius: 15px; overflow: hidden; border: 1px solid rgba(255,255,255,0.1); transition: 0.3s; }
-        .card:hover { transform: translateY(-5px); border-color: var(--accent); }
-        .card-img { width: 100%; height: 200px; object-fit: cover; }
-        .card-info { padding: 15px; }
-        .hidden-el { display: none; }
-        input, select, textarea { width: 100%; padding: 10px; margin: 5px 0; background: rgba(0,0,0,0.3); border: 1px solid #444; color: white; border-radius: 8px; box-sizing: border-box; }
-        button { cursor: pointer; padding: 10px 20px; border: none; border-radius: 8px; font-weight: 600; transition: 0.3s; }
-        .btn-save { background: var(--accent); color: black; width: 100%; margin-top: 10px; }
-        .tag { font-size: 0.7rem; text-transform: uppercase; padding: 3px 8px; border-radius: 5px; background: var(--accent); color: black; }
-    </style>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-<header style="text-align: center; margin-bottom: 40px;">
-    <h1 style="letter-spacing: 5px; color: var(--accent);">BITÁCORA DE C/A</h1>
-    <p>Archivo de Aventuras Eternas</p>
+<div class="background-overlay"></div>
+
+<header class="main-header">
+    <h1 class="glow-title">BITÁCORA DE C/A</h1>
+    <p class="subtitle">Sincronizando memorias con el sistema...</p>
 </header>
 
 <main class="container">
     <section class="glass-panel form-card">
-        <h3 id="formTitle">📝 Registrar Nueva Experiencia</h3>
-        <input type="hidden" id="editKey">
+        <div class="form-header">
+            <h3 id="formTitle">📝 Registrar Nueva Experiencia</h3>
+            <span id="statusBadge" class="badge">Sistema Online</span>
+        </div>
         
-        <select id="tipoEntrada">
-            <option value="lugar">📍 Salida / Lugar</option>
-            <option value="cine">🎬 Película / Cine</option>
-        </select>
-
-        <input type="text" id="nombre" placeholder="Nombre del lugar o película" required>
-        <input type="text" id="foto" placeholder="URL de la imagen (Direct Link)" required>
-        <input type="date" id="fecha" required>
-
-        <div id="camposDinamicos">
-            <input type="number" id="rating" min="1" max="10" placeholder="Puntuación (1-10)">
-            <textarea id="comentarioPositivo" placeholder="Lo mejor de la experiencia..."></textarea>
-            <textarea id="comentarioNegativo" placeholder="Lo que podría mejorar..."></textarea>
+        <div class="input-grid">
+            <div class="input-group">
+                <label>Tipo de Registro</label>
+                <select id="tipoEntrada">
+                    <option value="lugar">📍 Salida / Lugar</option>
+                    <option value="cine">🎬 Película / Cine</option>
+                </select>
+            </div>
+            <div class="input-group">
+                <label>Nombre</label>
+                <input type="text" id="nombre" placeholder="¿A dónde fuimos?" required>
+            </div>
+            <div class="input-group">
+                <label>URL de Imagen</label>
+                <input type="text" id="foto" placeholder="Enlace de la foto" required>
+            </div>
+            <div class="input-group">
+                <label>Fecha</label>
+                <input type="date" id="fecha" required>
+            </div>
+            <div class="input-group">
+                <label>Puntuación (1-10)</label>
+                <input type="number" id="rating" min="1" max="10" placeholder="⭐">
+            </div>
         </div>
 
-        <button class="btn-save" id="btnGuardar">Guardar en la Nube</button>
-        <button class="hidden-el" id="btnCancelar" style="background: #ff4444; margin-top: 10px; width: 100%;">Cancelar Edición</button>
+        <div class="textarea-group">
+            <textarea id="comentarioPositivo" placeholder="Lo más memorable..."></textarea>
+            <textarea id="comentarioNegativo" placeholder="Observaciones técnicas (o lo que no gustó)..."></textarea>
+        </div>
+
+        <input type="hidden" id="editKey">
+        <div class="form-actions">
+            <button class="btn-save" id="btnGuardar">Guardar en la Nube</button>
+            <button class="btn-cancel hidden-el" id="btnCancelar">Cancelar Edición</button>
+        </div>
     </section>
 
     <div class="grid-display" id="contenedorPrincipal">
@@ -71,33 +79,37 @@
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
     const aventurasRef = ref(db, 'aventuras');
-
-    // Elementos del DOM
     const cont = document.getElementById('contenedorPrincipal');
-    const btnGuardar = document.getElementById('btnGuardar');
 
-    // Función de Renderizado
+    onValue(aventurasRef, (snap) => {
+        const data = snap.val();
+        render(data);
+        window.rawCache = data;
+    });
+
     const render = (data) => {
         cont.innerHTML = '';
-        if (!data) {
-            cont.innerHTML = '<p style="text-align:center; grid-column: 1/-1;">No hay recuerdos guardados aún, Señor Carlos.</p>';
-            return;
-        }
+        if (!data) return;
 
         Object.keys(data).reverse().forEach(id => {
             const e = data[id];
             const card = document.createElement('div');
             card.className = 'card';
             card.innerHTML = `
-                <img src="${e.foto}" class="card-img" onerror="this.src='https://via.placeholder.com/400x250/111/fff?text=Error+de+Imagen'">
-                <div class="card-info">
-                    <span class="tag">${e.tipo}</span>
+                <div class="card-image-wrap">
+                    <img src="${e.foto}" onerror="this.src='https://via.placeholder.com/400x250/111/fff?text=C/A'">
+                    <div class="card-badge">${e.tipo}</div>
+                </div>
+                <div class="card-content">
                     <h3>${e.nombre}</h3>
-                    <p>📅 ${e.fecha} | ⭐ ${e.rating}/10</p>
-                    <p><i>${e.positivo || ''}</i></p>
-                    <div style="display:flex; gap: 10px; margin-top:10px;">
-                        <button onclick="prepararEdicion('${id}')" style="background:#444; font-size:0.8rem;">Editar</button>
-                        <button onclick="borrar('${id}')" style="background:#aa0000; font-size:0.8rem;">Borrar</button>
+                    <div class="card-meta">
+                        <span>📅 ${e.fecha}</span>
+                        <span class="rating-tag">⭐ ${e.rating}/10</span>
+                    </div>
+                    <p class="card-text">${e.positivo || ''}</p>
+                    <div class="card-actions">
+                        <button class="edit-btn" onclick="prepararEdicion('${id}')">Editar</button>
+                        <button class="del-btn" onclick="borrar('${id}')">Eliminar</button>
                     </div>
                 </div>
             `;
@@ -105,19 +117,7 @@
         });
     };
 
-    // Escuchar cambios en la base de datos
-    onValue(aventurasRef, (snap) => {
-        const data = snap.val();
-        render(data);
-        // Guardamos copia local para edición
-        window.rawCache = data;
-    }, (error) => {
-        console.error("Error de Firebase:", error);
-        cont.innerHTML = `<p style="color:red;">Error de conexión: ${error.message}</p>`;
-    });
-
-    // Guardar / Actualizar
-    btnGuardar.onclick = () => {
+    document.getElementById('btnGuardar').onclick = () => {
         const key = document.getElementById('editKey').value;
         const entry = {
             tipo: document.getElementById('tipoEntrada').value,
@@ -130,33 +130,9 @@
         };
 
         if (key) {
-            update(ref(db, `aventuras/${key}`), entry)
-                .then(() => resetForm())
-                .catch(err => alert("Error al actualizar: " + err.message));
+            update(ref(db, `aventuras/${key}`), entry).then(() => resetForm());
         } else {
-            push(aventurasRef, entry)
-                .then(() => resetForm())
-                .catch(err => alert("Error al guardar: " + err.message));
-        }
-    };
-
-    const resetForm = () => {
-        document.getElementById('editKey').value = '';
-        document.getElementById('nombre').value = '';
-        document.getElementById('foto').value = '';
-        document.getElementById('fecha').value = '';
-        document.getElementById('rating').value = '';
-        document.getElementById('comentarioPositivo').value = '';
-        document.getElementById('comentarioNegativo').value = '';
-        document.getElementById('formTitle').innerText = "📝 Registrar Nueva Experiencia";
-        document.getElementById('btnGuardar').innerText = "Guardar en la Nube";
-        document.getElementById('btnCancelar').classList.add('hidden-el');
-    };
-
-    // Funciones globales para los botones de las cards
-    window.borrar = (id) => {
-        if(confirm("¿Eliminar este recuerdo permanentemente?")) {
-            remove(ref(db, `aventuras/${id}`));
+            push(aventurasRef, entry).then(() => resetForm());
         }
     };
 
@@ -170,15 +146,22 @@
         document.getElementById('rating').value = e.rating;
         document.getElementById('comentarioPositivo').value = e.positivo;
         document.getElementById('comentarioNegativo').value = e.negativo;
-
+        
         document.getElementById('formTitle').innerText = "✏️ Editando Aventura";
-        document.getElementById('btnGuardar').innerText = "Actualizar Registro";
         document.getElementById('btnCancelar').classList.remove('hidden-el');
         window.scrollTo({top: 0, behavior: 'smooth'});
     };
 
+    window.borrar = (id) => confirm("¿Señor, está seguro de eliminar este registro?") && remove(ref(db, `aventuras/${id}`));
+    
+    const resetForm = () => {
+        document.querySelectorAll('input, textarea').forEach(i => i.value = '');
+        document.getElementById('editKey').value = '';
+        document.getElementById('formTitle').innerText = "📝 Registrar Nueva Experiencia";
+        document.getElementById('btnCancelar').classList.add('hidden-el');
+    };
+    
     document.getElementById('btnCancelar').onclick = resetForm;
-
 </script>
 </body>
 </html>
