@@ -5,123 +5,66 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bitácora de C/A | Carlos & Alexandra</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
+    <style>
+        /* Estilos base para asegurar visibilidad */
+        :root { --accent: #00ffaa; --bg: #0a0a0a; --glass: rgba(255,255,255,0.05); }
+        body { font-family: 'Poppins', sans-serif; background: var(--bg); color: white; margin: 0; padding: 20px; }
+        .glass-panel { background: var(--glass); backdrop-filter: blur(10px); border-radius: 15px; padding: 20px; margin-bottom: 20px; border: 1px solid rgba(255,255,255,0.1); }
+        .grid-display { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; }
+        .card { background: var(--glass); border-radius: 15px; overflow: hidden; border: 1px solid rgba(255,255,255,0.1); transition: 0.3s; }
+        .card:hover { transform: translateY(-5px); border-color: var(--accent); }
+        .card-img { width: 100%; height: 200px; object-fit: cover; }
+        .card-info { padding: 15px; }
+        .hidden-el { display: none; }
+        input, select, textarea { width: 100%; padding: 10px; margin: 5px 0; background: rgba(0,0,0,0.3); border: 1px solid #444; color: white; border-radius: 8px; box-sizing: border-box; }
+        button { cursor: pointer; padding: 10px 20px; border: none; border-radius: 8px; font-weight: 600; transition: 0.3s; }
+        .btn-save { background: var(--accent); color: black; width: 100%; margin-top: 10px; }
+        .tag { font-size: 0.7rem; text-transform: uppercase; padding: 3px 8px; border-radius: 5px; background: var(--accent); color: black; }
+    </style>
 </head>
 <body>
 
-<header class="main-header reveal">
-    <h1 class="glow-title">BITÁCORA DE C/A</h1>
-    <p class="subtitle">Archivo de Aventuras Eternas</p>
+<header style="text-align: center; margin-bottom: 40px;">
+    <h1 style="letter-spacing: 5px; color: var(--accent);">BITÁCORA DE C/A</h1>
+    <p>Archivo de Aventuras Eternas</p>
 </header>
 
 <main class="container">
-    <section class="glass-panel filters reveal" style="transition-delay: 0.2s;">
-        <div class="filter-row">
-            <div class="filter-item">
-                <label>📅 Por Fecha</label>
-                <input type="date" id="filtroFecha" onchange="window.filtrar()">
-            </div>
-            <div class="filter-item">
-                <label>⭐ Por Estrellas</label>
-                <select id="filtroEstrellas" onchange="window.filtrar()">
-                    <option value="todos">Todos</option>
-                    <option value="10">10 Estrellas</option>
-                    <option value="9">9 Estrellas</option>
-                    <option value="8">8 Estrellas</option>
-                    <option value="7">7 o menos</option>
-                </select>
-            </div>
-            <button class="btn-clean pulse" onclick="location.reload()">Limpiar Filtros</button>
-        </div>
-    </section>
-
-    <section class="glass-panel form-card reveal" style="transition-delay: 0.4s;">
-        <div class="form-header">
-            <h3 id="formTitle">📝 Registrar Nueva Experiencia</h3>
-            <span id="editBadge" class="badge-edit hidden-el">MODO EDICIÓN ACTIVO</span>
-        </div>
-        
+    <section class="glass-panel form-card">
+        <h3 id="formTitle">📝 Registrar Nueva Experiencia</h3>
         <input type="hidden" id="editKey">
         
-        <div class="form-body">
-            <div class="input-row main-select">
-                <select id="tipoEntrada" onchange="window.alternarCampos()" class="select-glow">
-                    <option value="lugar">📍 Salida / Lugar</option>
-                    <option value="cine">🎬 Película / Cine</option>
-                </select>
-            </div>
+        <select id="tipoEntrada">
+            <option value="lugar">📍 Salida / Lugar</option>
+            <option value="cine">🎬 Película / Cine</option>
+        </select>
 
-            <div class="input-grid">
-                <div class="input-group">
-                    <input type="text" id="nombre" placeholder=" " required>
-                    <label>Nombre del lugar o película</label>
-                </div>
-                <div class="input-group">
-                    <input type="text" id="foto" placeholder=" " required>
-                    <label>URL de la imagen</label>
-                </div>
-                <div class="input-group">
-                    <input type="date" id="fecha" required>
-                    <label class="static-label">Fecha</label>
-                </div>
-            </div>
+        <input type="text" id="nombre" placeholder="Nombre del lugar o película" required>
+        <input type="text" id="foto" placeholder="URL de la imagen (Direct Link)" required>
+        <input type="date" id="fecha" required>
 
-            <div id="camposLugar" class="dynamic-section">
-                <div class="input-grid-2">
-                    <div class="input-group">
-                        <input type="number" id="califLugar" min="1" max="10" placeholder=" ">
-                        <label>Puntuación (1-10)</label>
-                    </div>
-                    <div class="input-group">
-                        <input type="text" id="datoLugar" placeholder=" ">
-                        <label>Dato importante</label>
-                    </div>
-                </div>
-                <div class="textarea-grid">
-                    <textarea id="divertido" placeholder="Lo más divertido..."></textarea>
-                    <textarea id="aburrido" placeholder="Lo más aburrido..."></textarea>
-                </div>
-            </div>
-
-            <div id="camposCine" class="dynamic-section hidden-el">
-                <div class="input-grid-2">
-                    <div class="input-group">
-                        <input type="number" id="estrellas" min="1" max="10" placeholder=" ">
-                        <label>Estrellas (1-10)</label>
-                    </div>
-                    <div class="input-group">
-                        <input type="text" id="sensaciones" placeholder=" ">
-                        <label>Sensaciones</label>
-                    </div>
-                </div>
-                <div class="textarea-grid">
-                    <textarea id="gustoCine" placeholder="Lo que más nos gustó..."></textarea>
-                    <textarea id="noGustoCine" placeholder="Lo que no nos gustó..."></textarea>
-                </div>
-            </div>
-
-            <div class="form-footer">
-                <button class="btn-save btn-glow" id="btnGuardar">Guardar en la Nube</button>
-                <button class="btn-cancel hidden-el" id="btnCancelar" onclick="window.cancelarEdicion()">Cancelar</button>
-            </div>
+        <div id="camposDinamicos">
+            <input type="number" id="rating" min="1" max="10" placeholder="Puntuación (1-10)">
+            <textarea id="comentarioPositivo" placeholder="Lo mejor de la experiencia..."></textarea>
+            <textarea id="comentarioNegativo" placeholder="Lo que podría mejorar..."></textarea>
         </div>
+
+        <button class="btn-save" id="btnGuardar">Guardar en la Nube</button>
+        <button class="hidden-el" id="btnCancelar" style="background: #ff4444; margin-top: 10px; width: 100%;">Cancelar Edición</button>
     </section>
 
-    <div class="grid-display" id="contenedorPrincipal"></div>
+    <div class="grid-display" id="contenedorPrincipal">
+        </div>
 </main>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
     import { getDatabase, ref, push, onValue, remove, update } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
-    // Configuración de image_8a7430.png
     const firebaseConfig = {
         apiKey: "AIzaSyDgc_fOFDZZTcBe2mtD0uGpgcFl4f34oPI",
         authDomain: "bitacora-ca.firebaseapp.com",
         projectId: "bitacora-ca",
-        storageBucket: "bitacora-ca.firebasestorage.app",
-        messagingSenderId: "707668977849",
-        appId: "1:707668977849:web:5e72c6eb55fcdfb4dad368",
         databaseURL: "https://bitacora-ca-default-rtdb.firebaseio.com/"
     };
 
@@ -129,96 +72,113 @@
     const db = getDatabase(app);
     const aventurasRef = ref(db, 'aventuras');
 
-    window.alternarCampos = () => {
-        const t = document.getElementById('tipoEntrada').value;
-        const cLugar = document.getElementById('camposLugar');
-        const cCine = document.getElementById('camposCine');
-        
-        cLugar.classList.toggle('hidden-el', t !== 'lugar');
-        cCine.classList.toggle('hidden-el', t !== 'cine');
-    };
+    // Elementos del DOM
+    const cont = document.getElementById('contenedorPrincipal');
+    const btnGuardar = document.getElementById('btnGuardar');
 
-    document.getElementById('btnGuardar').onclick = () => {
-        const key = document.getElementById('editKey').value;
-        const tipo = document.getElementById('tipoEntrada').value;
-        const entry = {
-            tipo,
-            nombre: document.getElementById('nombre').value,
-            foto: document.getElementById('foto').value,
-            fecha: document.getElementById('fecha').value,
-            rating: tipo === 'lugar' ? document.getElementById('califLugar').value : document.getElementById('estrellas').value,
-            divertido: document.getElementById('divertido').value || "",
-            aburrido: document.getElementById('aburrido').value || "",
-            sensaciones: document.getElementById('sensaciones').value || "",
-            gusto: document.getElementById('gustoCine').value || "",
-            noGusto: document.getElementById('noGustoCine').value || "",
-            dato: document.getElementById('datoLugar').value || ""
-        };
-
-        if(key) {
-            update(ref(db, `aventuras/${key}`), entry).then(() => location.reload());
-        } else {
-            push(aventurasRef, entry).then(() => location.reload());
-        }
-    };
-
-    onValue(aventurasRef, (snap) => {
-        window.raw = snap.val();
-        window.render(window.raw);
-    });
-
-    window.render = (data) => {
-        const cont = document.getElementById('contenedorPrincipal');
+    // Función de Renderizado
+    const render = (data) => {
         cont.innerHTML = '';
-        if(!data) return;
-        Object.keys(data).reverse().forEach((id, index) => {
+        if (!data) {
+            cont.innerHTML = '<p style="text-align:center; grid-column: 1/-1;">No hay recuerdos guardados aún, Señor Carlos.</p>';
+            return;
+        }
+
+        Object.keys(data).reverse().forEach(id => {
             const e = data[id];
-            cont.innerHTML += `
-                <div class="card reveal" style="transition-delay: ${index * 0.1}s">
-                    <div class="img-container">
-                        <img src="${e.foto}" class="card-img" onerror="this.src='https://via.placeholder.com/400x250/111/fff?text=C/A'">
+            const card = document.createElement('div');
+            card.className = 'card';
+            card.innerHTML = `
+                <img src="${e.foto}" class="card-img" onerror="this.src='https://via.placeholder.com/400x250/111/fff?text=Error+de+Imagen'">
+                <div class="card-info">
+                    <span class="tag">${e.tipo}</span>
+                    <h3>${e.nombre}</h3>
+                    <p>📅 ${e.fecha} | ⭐ ${e.rating}/10</p>
+                    <p><i>${e.positivo || ''}</i></p>
+                    <div style="display:flex; gap: 10px; margin-top:10px;">
+                        <button onclick="prepararEdicion('${id}')" style="background:#444; font-size:0.8rem;">Editar</button>
+                        <button onclick="borrar('${id}')" style="background:#aa0000; font-size:0.8rem;">Borrar</button>
                     </div>
-                    <div class="card-info">
-                        <span class="tag ${e.tipo}">${e.tipo}</span>
-                        <h3>${e.nombre}</h3>
-                        <p class="card-date">📅 ${e.fecha} | ⭐ ${e.rating}/10</p>
-                        <div class="card-actions">
-                            <button class="edit-btn" onclick="prepararEdicion('${id}')">Editar</button>
-                            <button class="del-btn" onclick="borrar('${id}')">Borrar</button>
-                        </div>
-                    </div>
-                </div>`;
+                </div>
+            `;
+            cont.appendChild(card);
         });
     };
 
+    // Escuchar cambios en la base de datos
+    onValue(aventurasRef, (snap) => {
+        const data = snap.val();
+        render(data);
+        // Guardamos copia local para edición
+        window.rawCache = data;
+    }, (error) => {
+        console.error("Error de Firebase:", error);
+        cont.innerHTML = `<p style="color:red;">Error de conexión: ${error.message}</p>`;
+    });
+
+    // Guardar / Actualizar
+    btnGuardar.onclick = () => {
+        const key = document.getElementById('editKey').value;
+        const entry = {
+            tipo: document.getElementById('tipoEntrada').value,
+            nombre: document.getElementById('nombre').value,
+            foto: document.getElementById('foto').value,
+            fecha: document.getElementById('fecha').value,
+            rating: document.getElementById('rating').value,
+            positivo: document.getElementById('comentarioPositivo').value,
+            negativo: document.getElementById('comentarioNegativo').value
+        };
+
+        if (key) {
+            update(ref(db, `aventuras/${key}`), entry)
+                .then(() => resetForm())
+                .catch(err => alert("Error al actualizar: " + err.message));
+        } else {
+            push(aventurasRef, entry)
+                .then(() => resetForm())
+                .catch(err => alert("Error al guardar: " + err.message));
+        }
+    };
+
+    const resetForm = () => {
+        document.getElementById('editKey').value = '';
+        document.getElementById('nombre').value = '';
+        document.getElementById('foto').value = '';
+        document.getElementById('fecha').value = '';
+        document.getElementById('rating').value = '';
+        document.getElementById('comentarioPositivo').value = '';
+        document.getElementById('comentarioNegativo').value = '';
+        document.getElementById('formTitle').innerText = "📝 Registrar Nueva Experiencia";
+        document.getElementById('btnGuardar').innerText = "Guardar en la Nube";
+        document.getElementById('btnCancelar').classList.add('hidden-el');
+    };
+
+    // Funciones globales para los botones de las cards
+    window.borrar = (id) => {
+        if(confirm("¿Eliminar este recuerdo permanentemente?")) {
+            remove(ref(db, `aventuras/${id}`));
+        }
+    };
+
     window.prepararEdicion = (id) => {
-        const e = window.raw[id];
+        const e = window.rawCache[id];
         document.getElementById('editKey').value = id;
         document.getElementById('tipoEntrada').value = e.tipo;
         document.getElementById('nombre').value = e.nombre;
         document.getElementById('foto').value = e.foto;
         document.getElementById('fecha').value = e.fecha;
-        if(e.tipo === 'lugar') {
-            document.getElementById('califLugar').value = e.rating;
-            document.getElementById('divertido').value = e.divertido;
-            document.getElementById('aburrido').value = e.aburrido;
-            document.getElementById('datoLugar').value = e.dato;
-        } else {
-            document.getElementById('estrellas').value = e.rating;
-            document.getElementById('sensaciones').value = e.sensaciones;
-            document.getElementById('gustoCine').value = e.gusto;
-            document.getElementById('noGustoCine').value = e.noGusto;
-        }
-        window.alternarCampos();
+        document.getElementById('rating').value = e.rating;
+        document.getElementById('comentarioPositivo').value = e.positivo;
+        document.getElementById('comentarioNegativo').value = e.negativo;
+
         document.getElementById('formTitle').innerText = "✏️ Editando Aventura";
         document.getElementById('btnGuardar').innerText = "Actualizar Registro";
         document.getElementById('btnCancelar').classList.remove('hidden-el');
-        document.getElementById('editBadge').classList.remove('hidden-el');
         window.scrollTo({top: 0, behavior: 'smooth'});
     };
 
-    window.borrar = (id) => confirm("¿Desea borrar este recuerdo?") && remove(ref(db, `aventuras/${id}`));
-    window.cancelarEdicion = () => location.reload();
+    document.getElementById('btnCancelar').onclick = resetForm;
+
 </script>
 </body>
 </html>
